@@ -2,10 +2,10 @@
 
 
 .navbar-board {
-    height: $navbar-board-height;
-    padding-left: $gap;
     display: flex;
-    align-items: center;
     font-size: 1.1rem;
+    padding-left: $gap;
+    align-items: center;
+    height: $navbar-board-height;
     background-color: $board-bg-color;
 }

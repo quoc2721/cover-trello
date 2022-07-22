@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { isEmpty } from 'lodash'
 import { Container, Draggable } from 'react-smooth-dnd'
 import { Container as ContainerBoostrap, Row, Col, Form, Button } from 'react-bootstrap'
@@ -14,11 +14,13 @@ import { applyDrag } from 'utilities/drapDrop'
 function BoardContent() {
   const [board, setBoard] = useState({})
   const [columns, setColumns] = useState([])
-  const [openNewColumnForm, setOpenNewColumnForm] = useState([false])
-  const [newColumnTitle, setNewColumnTitle] = useState('')
+  const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
+  const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
   const newColumnInputRef = useRef(null)
-  const onNewColumnTitleChange = useCallback((e) => setNewColumnTitle(e.target.value), [])
+
+  const [newColumnTitle, setNewColumnTitle] = useState('')
+  const onNewColumnTitleChange = (e) => setNewColumnTitle(e.target.value)
 
   useEffect(() => {
     const boardFromDB = initialData.boards.find(board => board.id === 'board-1')
@@ -64,11 +66,8 @@ function BoardContent() {
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult)
       currentColumn.cardOrder = currentColumn.cards.map(i => i.id)
       setColumns(newColumns)
-
-      console.log(dropResult)
     }
   }
-  const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
   const addNewColumn = () => {
     if (!newColumnTitle) {
@@ -94,6 +93,27 @@ function BoardContent() {
     toggleOpenNewColumnForm()
   }
 
+  const onUpdateColumn = (newColumnToUpdate) => {
+    const columnIdToUpdate = newColumnToUpdate.id
+
+    let newColumns = [...columns]
+    const columnIndexToUpdate = newColumns.findIndex(i => i.id === columnIdToUpdate)
+    
+    if(newColumnToUpdate._destroy) {
+
+      newColumns.splice(columnIndexToUpdate, 1)
+    } else {
+      
+      newColumns.splice(columnIndexToUpdate, 1, newColumnToUpdate)
+    }
+
+    let newBoard = { ...board }
+    newBoard.columnOrder = newColumns.map( c => c.id)
+    newBoard.columns = newColumns
+    
+    setColumns(newColumns)
+    setBoard(newBoard)
+  }
   return (
     <div className='board-content'>
       <Container
@@ -109,7 +129,11 @@ function BoardContent() {
       >
         {columns.map((column, index) => (
           <Draggable key={index}>
-            <Column column={column} onCardDrop={onCardDrop} />
+            <Column 
+              column={column}
+              onCardDrop={onCardDrop}
+              onUpdateColumn={onUpdateColumn}
+              />
           </Draggable>
         ))}
 
@@ -137,7 +161,7 @@ function BoardContent() {
             >
             </Form.Control>
             <Button variant='success' size='sm' onClick={addNewColumn}> Add column</Button>
-            <span className='cancel-new-column'>
+            <span className='cancel-icon'>
               <i className='fa fa-trash icon' onClick={toggleOpenNewColumnForm}> </i>
             </span>
           </Col>
