@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-import '../AppBar/AppBar.scss';
+import '../AppBar/AppBar.scss'
 
 function AppBar() {
     return(

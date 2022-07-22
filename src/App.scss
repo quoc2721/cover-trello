@@ -5,23 +5,23 @@
 
 body {
     margin: 0;
-    font-family: 'Source Sans Pro', sans-serif;
     font-size: 14px;
     line-height: 1.3em;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .App {
     height: 100vh;
     overflow: hidden;
-    background-color: $board-bg-color;
     color: $app-main-text-color;
+    background-color: $board-bg-color;
     .icon {
-        font-size: 14px;
         margin: 0 3px;
+        font-size: 14px;
     }
     .trello-container{
-        margin:  0 15px;
         padding: 0;
+        margin:  0 15px;
     }
     textarea:focus, 
     textarea.form-control:focus, 
@@ -36,11 +36,32 @@ body {
     [type=tel].form-control:focus, 
     [contenteditable].form-control:focus {
     box-shadow: none;
-    border: 1px solid #ccc;
+    border: 1px solid $input-border-color;
     }
     .btn:focus, .btn:active {
-        outline: none;
-        box-shadow: none;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .content-editable {
+        border: none;
+        cursor: pointer;
+        font-size:  inherit;
+        font-weight: inherit;
+        background-color: inherit;
+        &:focus{
+            background-color: white;
+        }
+    }
+    span.cancel-icon {
+        cursor: pointer;
+        margin-left: $gap;
+        i {
+            font-size: 18px;
+            color:$alert-danger;
+            &:hover{
+                color: darken($alert-danger, 10)
+            }
+        }
     }
     
 }
