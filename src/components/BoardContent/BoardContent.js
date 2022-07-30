@@ -8,7 +8,7 @@ import '../BoardContent/BoardContent.scss'
 import Column from 'components/Column/Column'
 import { mapOrder } from 'utilities/sorts'
 import { applyDrag } from 'utilities/drapDrop'
-import { fetchBoardDetails} from '../.././actions/ApiCall/index'
+import { fetchBoardDetails, createNewColumn } from '../.././actions/ApiCall/index'
 
 
 function BoardContent() {
@@ -47,7 +47,7 @@ function BoardContent() {
     let newColumns = [...columns]
     newColumns = applyDrag(newColumns, dropResult)
 
-    let newBoard = { ...board}
+    let newBoard = { ...board }
     newBoard.columnOrder = newColumns.map( c => c._id)
     newBoard.columns = newColumns
     setColumns(newColumns)
@@ -70,42 +70,42 @@ function BoardContent() {
       return
     }
     const newColumnToAdd = {
-      id: Math.random().toString(36).substring(2, 5),
       boardId: board._id,
-      title: newColumnTitle.trim(),
-      cardOrder: [],
-      cards: []
+      title: newColumnTitle.trim()
     }
-    let newColumns = [...columns]
-    newColumns.push(newColumnToAdd)
+    createNewColumn(newColumnToAdd).then(column => {
 
-    let newBoard = { ...board }
-    newBoard.columnOrder = newColumns.map( c => c._id)
-    newBoard.columns = newColumns
-    setColumns(newColumns)
-    setBoard(newBoard)
-    setNewColumnTitle('')
-    toggleOpenNewColumnForm()
+      let newColumns = [...columns]
+      newColumns.push(column)
+
+      let newBoard = { ...board }
+      newBoard.columnOrder = newColumns.map( c => c._id)
+      newBoard.columns = newColumns
+
+      setColumns(newColumns)
+      setBoard(newBoard)
+      setNewColumnTitle('')
+      toggleOpenNewColumnForm()
+
+    })
+
   }
 
-  const onUpdateColumn = (newColumnToUpdate) => {
+  const onUpdateColumnState = (newColumnToUpdate) => {
     const columnIdToUpdate = newColumnToUpdate._id
 
     let newColumns = [...columns]
     const columnIndexToUpdate = newColumns.findIndex(i => i._id === columnIdToUpdate)
-    
     if(newColumnToUpdate._destroy) {
 
       newColumns.splice(columnIndexToUpdate, 1)
     } else {
-      
       newColumns.splice(columnIndexToUpdate, 1, newColumnToUpdate)
     }
 
     let newBoard = { ...board }
     newBoard.columnOrder = newColumns.map( c => c._id)
     newBoard.columns = newColumns
-    
     setColumns(newColumns)
     setBoard(newBoard)
   }
@@ -127,24 +127,23 @@ function BoardContent() {
             <Column 
               column={column}
               onCardDrop={onCardDrop}
-              onUpdateColumn={onUpdateColumn}
-              />
+              onUpdateColumnState={onUpdateColumnState}/>
           </Draggable>
         ))}
 
       </Container>
       <ContainerBoostrap className='trello-container'>
-        {openNewColumnForm && 
+        {!openNewColumnForm &&
         <Row>
           <Col className='add-new-column' onClick={toggleOpenNewColumnForm}>
             <i className='fa fa-plus icon'> Add another column</i>
           </Col>
         </Row>
-        } 
-        {!openNewColumnForm && 
+        }
+        {openNewColumnForm &&
         <Row>
           <Col className='enter-new-column'>
-            <Form.Control 
+            <Form.Control
               size='sm'
               type='text'
               placeholder='Enter column title'
@@ -155,7 +154,12 @@ function BoardContent() {
               onKeyDown={ e => (e.key === 'Enter') && addNewColumn()}
             >
             </Form.Control>
-            <Button variant='success' size='sm' onClick={addNewColumn}> Add column</Button>
+            <Button 
+              variant='success'
+              size='sm' 
+              onClick={addNewColumn}
+
+            > Add column</Button>
             <span className='cancel-icon'>
               <i className='fa fa-trash icon' onClick={toggleOpenNewColumnForm}> </i>
             </span>

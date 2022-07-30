@@ -8,11 +8,12 @@ import { Container, Draggable } from 'react-smooth-dnd'
 import { Dropdown, Form, Button } from 'react-bootstrap'
 import { MODAL_ACTION_CONFIRM } from 'utilities/contants'
 import ConfirmModel from 'components/Common/ConfirmModal'
+import { createNewCard, updateColumn } from '../../actions/ApiCall/index'
 import { saveContentAfterPressEnter, selectAllInlineText } from 'utilities/contentsEdittable'
 
 
 function Column(props) {
-  const { column, onCardDrop, onUpdateColumn} = props
+  const { column, onCardDrop, onUpdateColumnState} = props
   const cards = mapOrder(column.cards, column.cardOrder, '_id')
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
@@ -47,16 +48,26 @@ function Column(props) {
         ...column,
         _destroy: true
       }
-      onUpdateColumn(newColumn)
+      updateColumn(newColumn._id, newColumn).then(updatedColumn => {
+        onUpdateColumnState(updatedColumn)
+
+      })
     }
     toggleShowConfirmModal()
   }
   const handleColumnTitleBlur = () => {
-    const newColumn = {
-      ...column,
-      title: columnTitle
+    if(columnTitle !== column.title) {
+      const newColumn = {
+        ...column,
+        title: columnTitle
+      }
+      updateColumn(newColumn._id, newColumn).then(updatedColumn => {
+        updateColumn.cards = newColumn.cards
+        onUpdateColumnState(updatedColumn)
+  
+      })
+
     }
-    onUpdateColumn(newColumn)
   }
   const addNewCard = () => {
     if (!newCardTitle) {
@@ -64,19 +75,20 @@ function Column(props) {
       return
     }
     const newCardToAdd = {
-      id: Math.random().toString(36).substring(2, 5),
       boardId: column.boardId,
       columnId: column.id,
-      title: newCardTitle.trim(),
-      cover:null
+      title: newCardTitle.trim()
     }
-    const newColumn = cloneDeep(column)
-    newColumn.cards.push(newCardToAdd)
-    newColumn.cardOrder.push(newCardToAdd._id)
+    createNewCard(newCardToAdd).then(card => {
+      let newColumn = cloneDeep(column)
+      newColumn.cards.push(card)
+      newColumn.cardOrder.push(card._id)
 
-    onUpdateColumn(newColumn)
-    setNewCardTitle('')
-    toggleOpenNewColumnForm()
+      onUpdateColumnState(newColumn)
+      setNewCardTitle('')
+      toggleOpenNewColumnForm()
+
+    })
   }
 
   return (
