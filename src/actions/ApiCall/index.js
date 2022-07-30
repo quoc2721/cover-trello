@@ -6,7 +6,18 @@ export const fetchBoardDetails = async (id) => {
   return request.data
 }
 
-// export const createNewColumn = async (data) => {
-//     const request = await axios.post(`http://localhost:5000/v1/columns/`, data)
-//     return request.data
-//   }
+export const createNewColumn = async (data) => {
+  const request = await axios.post(`${API_ROOT}/v1/columns`, data)
+  return request.data
+}
+
+export const updateColumn = async (id, data) => {
+  const request = await axios.put(`${API_ROOT}/v1/columns/${id}`, data)
+  return request.data
+}
+
+export const createNewCard = async (data) => {
+  const request = await axios.post(`${API_ROOT}/v1/cards`, data)
+  return request.data
+}
+
