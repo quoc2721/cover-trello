@@ -8,12 +8,12 @@ import '../BoardContent/BoardContent.scss'
 import Column from 'components/Column/Column'
 import { mapOrder } from 'utilities/sorts'
 import { applyDrag } from 'utilities/drapDrop'
-import { 
-  fetchBoardDetails, 
-  createNewColumn, 
-  updateBoard, 
-  updateColumn, 
-  updateCard 
+import {
+  fetchBoardDetails,
+  createNewColumn,
+  updateBoard,
+  updateColumn,
+  updateCard
 } from '../.././actions/ApiCall/index'
 
 
@@ -120,7 +120,7 @@ function BoardContent() {
 
     let newColumns = [...columns]
     const columnIndexToUpdate = newColumns.findIndex(i => i._id === columnIdToUpdate)
-    if(newColumnToUpdate._destroy) {
+    if (newColumnToUpdate._destroy) {
 
       newColumns.splice(columnIndexToUpdate, 1)
     } else {
@@ -148,7 +148,7 @@ function BoardContent() {
       >
         {columns.map((column, index) => (
           <Draggable key={index}>
-            <Column 
+            <Column
               column={column}
               onCardDrop={onCardDrop}
               onUpdateColumnState={onUpdateColumnState}/>
@@ -178,9 +178,9 @@ function BoardContent() {
               onKeyDown={ e => (e.key === 'Enter') && addNewColumn()}
             >
             </Form.Control>
-            <Button 
+            <Button
               variant='success'
-              size='sm' 
+              size='sm'
               onClick={addNewColumn}
 
             > Add column</Button>

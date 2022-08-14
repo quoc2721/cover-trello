@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import '../Column/Column.scss'
 import { cloneDeep } from 'lodash'
@@ -13,17 +13,17 @@ import { saveContentAfterPressEnter, selectAllInlineText } from 'utilities/conte
 
 
 function Column(props) {
-  const { column, onCardDrop, onUpdateColumnState} = props
+  const { column, onCardDrop, onUpdateColumnState } = props
   const cards = mapOrder(column.cards, column.cardOrder, '_id')
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const toggleShowConfirmModal = () => setShowConfirmModal(!showConfirmModal)
 
   const [columnTitle, setColumnTitle] = useState('')
-  const handleColumnTitleChange = useCallback((e) => setColumnTitle(e.target.value), [])
+  const handleColumnTitleChange = (e) => setColumnTitle(e.target.value)
 
-  const [openNewCardForm, setOpenNewColumnForm] = useState([false])
-  const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewCardForm)
+  const [openNewCardForm, setOpenNewCardForm] = useState(false)
+  const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
 
   const newCardTextareaRef = useRef(null)
 
@@ -55,16 +55,17 @@ function Column(props) {
     }
     toggleShowConfirmModal()
   }
+
   const handleColumnTitleBlur = () => {
-    if(columnTitle !== column.title) {
+    if (columnTitle !== column.title) {
       const newColumn = {
         ...column,
         title: columnTitle
       }
       updateColumn(newColumn._id, newColumn).then(updatedColumn => {
-        updateColumn.cards = newColumn.cards
+        updatedColumn.cards = newColumn.cards
         onUpdateColumnState(updatedColumn)
-  
+
       })
 
     }
@@ -76,7 +77,7 @@ function Column(props) {
     }
     const newCardToAdd = {
       boardId: column.boardId,
-      columnId: column.id,
+      columnId: column._id,
       title: newCardTitle.trim()
     }
     createNewCard(newCardToAdd).then(card => {
@@ -86,7 +87,7 @@ function Column(props) {
 
       onUpdateColumnState(newColumn)
       setNewCardTitle('')
-      toggleOpenNewColumnForm()
+      toggleOpenNewCardForm()
 
     })
   }
@@ -115,7 +116,7 @@ function Column(props) {
             <Dropdown.Toggle id="dropdown-basic" size='sm' className='dropdown-btn'/>
 
             <Dropdown.Menu>
-              <Dropdown.Item onClick={toggleOpenNewColumnForm}>Add card</Dropdown.Item>
+              <Dropdown.Item onClick={toggleOpenNewCardForm}>Add card</Dropdown.Item>
               <Dropdown.Item onClick={toggleShowConfirmModal}>Remove column</Dropdown.Item>
               <Dropdown.Item>Move all cards in this column</Dropdown.Item>
               <Dropdown.Item>Archive all card in this column</Dropdown.Item>
@@ -132,7 +133,7 @@ function Column(props) {
           getChildPayload={index => cards[index] }
           dragClass="card-ghost"
           dropClass='card-ghost-drop'
-          onDropReady={p => console.log('Drop realy:', p)}
+          // onDropReady={p => console.log('Drop realy:', p)}
           dropPlaceholder={{
             animationDuration: 150,
             showOnTop: true,
@@ -146,9 +147,9 @@ function Column(props) {
             </Draggable>
           ))}
         </Container>
-        {!openNewCardForm &&
+        {openNewCardForm &&
         <div className='add-new-card-area'>
-          <Form.Control 
+          <Form.Control
             size='sm'
             as='textarea'
             rows='3'
@@ -164,16 +165,16 @@ function Column(props) {
         }
       </div>
       <footer>
-        {!openNewCardForm &&
+        {openNewCardForm &&
         <div className='add-new-card-actions'>
           <Button variant='success' size='sm' onClick={addNewCard}> Add card</Button>
-          <span className='cancel-icon' onClick={toggleOpenNewColumnForm}>
+          <span className='cancel-icon' onClick={toggleOpenNewCardForm}>
             <i className='fa fa-trash icon'> </i>
           </span>
         </div>
         }
-        {openNewCardForm &&
-        <div className='footer-actions' onClick={toggleOpenNewColumnForm}>
+        {!openNewCardForm &&
+        <div className='footer-actions' onClick={toggleOpenNewCardForm}>
           <i className='fa fa-plus icon'/> Add another card
         </div>
         }
